@@ -1,5 +1,8 @@
 import { safeJSONParse, showToast, showConfirmationModal } from './utils.js';
 
+// Variable para rastrear qué usuario se está editando
+let editingUserId = null;
+
 export function renderizarUsuarios(usuarioLogeado) {
     const tablaUsuariosBody = document.querySelector('#tabla-usuarios tbody');
     if (!tablaUsuariosBody) return;
@@ -7,7 +10,7 @@ export function renderizarUsuarios(usuarioLogeado) {
     let usuarios = safeJSONParse('usuarios', []);
     let finalHTML = '';
 
-    // --- Fila 1: Formulario para Añadir Usuario ---
+    // Fila 1: Formulario para Añadir Usuario
     finalHTML += `
         <tr class="add-user-form-row">
             <td><input type="text" id="new-username-input" placeholder="Nuevo usuario" required></td>
@@ -25,48 +28,54 @@ export function renderizarUsuarios(usuarioLogeado) {
         </tr>
     `;
 
-    // --- Filas Siguientes: Usuarios Existentes ---
+    // Filas Siguientes: Usuarios Existentes
     usuarios.forEach(user => {
         const esAdmin = user.username === 'admin';
         const esUsuarioActual = user.id === usuarioLogeado.id;
-        const disableActions = esAdmin || usuarioLogeado.rol !== 'administrador';
+        const isEditing = user.id === editingUserId;
 
-        finalHTML += `<tr data-user-id="${user.id}">`;
-        
+        finalHTML += `<tr data-user-id="${user.id}" class="${isEditing ? 'editing-row' : ''}">`;
+
         // Celda de Usuario
-        finalHTML += `<td>${user.username}</td>`;
+        if (isEditing) {
+            finalHTML += `<td><input type="text" class="edit-username-input" value="${user.username}"></td>`;
+        } else {
+            finalHTML += `<td>${user.username}</td>`;
+        }
         
         // Celda de Contraseña
         finalHTML += `<td class="actions-cell">`;
-        if (!disableActions) {
-             finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
+        if (!esAdmin) {
+            finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
         } else {
-             finalHTML += '••••••••';
+            finalHTML += '••••••••';
         }
         finalHTML += `</td>`;
 
         // Celda de Rol
-        finalHTML += '<td>';
-        if(disableActions) {
-            finalHTML += user.rol;
-        } else {
+        if (isEditing) {
             const rolesDisponibles = ['administrador', 'supervisor', 'ventas'];
             let options = rolesDisponibles.map(rol => `<option value="${rol}" ${user.rol === rol ? 'selected' : ''}>${rol}</option>`).join('');
-            finalHTML += `<select class="user-role-select">${options}</select>`;
+            finalHTML += `<td><select class="edit-role-select">${options}</select></td>`;
+        } else {
+            finalHTML += `<td>${user.rol}</td>`;
         }
-        finalHTML += '</td>';
 
         // Celda de Acciones
         finalHTML += `<td class="actions-cell">`;
-        if (!disableActions) {
-             finalHTML += `<button class="button button-primary save-user-btn">Guardar</button>`;
-        }
-        if (!esUsuarioActual && !disableActions) { 
-            finalHTML += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
+        if (!esAdmin && usuarioLogeado.rol === 'administrador') {
+            if (isEditing) {
+                finalHTML += `<button class="button button-primary save-edit-btn">Guardar</button>`;
+                finalHTML += `<button class="button button-secondary cancel-edit-btn">Cancelar</button>`;
+            } else {
+                finalHTML += `<button class="button button-secondary edit-user-btn">Editar</button>`;
+                if (!esUsuarioActual) {
+                    finalHTML += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
+                }
+            }
         }
         finalHTML += `</td>`;
-
-        finalHTML += '</tr>';
+        finalHTML += `</tr>`;
     });
 
     tablaUsuariosBody.innerHTML = finalHTML;
@@ -76,12 +85,89 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
     const configContent = document.getElementById('modal-configuracion');
     if (!configContent) return;
 
-    // Se usa un solo listener en un elemento padre para manejar todos los clics
     configContent.addEventListener('click', (e) => {
         const target = e.target;
         
-        // Lógica para AÑADIR USUARIO
+        // --- AÑADIR USUARIO ---
         if (target.id === 'add-user-btn') {
+            // ... (la lógica para añadir no cambia)
+        }
+
+        const row = target.closest('tr[data-user-id]');
+        if (!row) return;
+        const userId = Number(row.dataset.userId);
+
+        // --- ENTRAR EN MODO EDICIÓN ---
+        if (target.classList.contains('edit-user-btn')) {
+            editingUserId = userId;
+            renderizarUsuarios(usuarioLogeado);
+        }
+
+        // --- CANCELAR EDICIÓN ---
+        if (target.classList.contains('cancel-edit-btn')) {
+            editingUserId = null;
+            renderizarUsuarios(usuarioLogeado);
+        }
+
+        // --- GUARDAR CAMBIOS ---
+        if (target.classList.contains('save-edit-btn')) {
+            const updatedUsername = row.querySelector('.edit-username-input').value.trim();
+            const updatedRole = row.querySelector('.edit-role-select').value;
+            
+            if (!updatedUsername) {
+                showToast('El nombre de usuario no puede estar vacío.', 'error');
+                return;
+            }
+
+            let usuarios = safeJSONParse('usuarios', []);
+            const isUsernameDuplicate = usuarios.some(u => u.username.toLowerCase() === updatedUsername.toLowerCase() && u.id !== userId);
+
+            if (isUsernameDuplicate) {
+                showToast('Ese nombre de usuario ya está en uso.', 'error');
+                return;
+            }
+
+            const user = usuarios.find(u => u.id === userId);
+            if (user) {
+                user.username = updatedUsername;
+                user.rol = updatedRole;
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                showToast('Usuario actualizado.', 'success');
+                editingUserId = null; // Salir de modo edición
+                renderizarUsuarios(usuarioLogeado);
+            }
+        }
+
+        // --- ELIMINAR Y CAMBIAR CLAVE (no cambian) ---
+        if (target.classList.contains('remove-user-btn')) {
+            showConfirmationModal('¿Estás seguro de eliminar este usuario?', () => {
+                let usuarios = safeJSONParse('usuarios', []);
+                usuarios = usuarios.filter(u => u.id !== userId);
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                showToast('Usuario eliminado.', 'success');
+                renderizarUsuarios(usuarioLogeado);
+            });
+        }
+        
+        if (target.classList.contains('change-password-btn')) {
+            const newPassword = prompt("Introduce la nueva contraseña para este usuario:");
+            if (newPassword && newPassword.trim() !== '') {
+                let usuarios = safeJSONParse('usuarios', []);
+                const user = usuarios.find(u => u.id === userId);
+                if (user) {
+                    user.password = newPassword;
+                    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                    showToast('Contraseña actualizada.', 'success');
+                }
+            }
+        }
+    });
+
+    // Añadir el listener para el formulario de nuevo usuario por separado
+    const addUserForm = document.getElementById('form-add-user');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             const newUsernameInput = document.getElementById('new-username-input');
             const newPasswordInput = document.getElementById('new-password-input');
             const newRoleSelect = document.getElementById('new-user-role-select');
@@ -105,50 +191,9 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
                 localStorage.setItem('usuarios', JSON.stringify(usuarios));
                 
                 showToast('Usuario añadido exitosamente.', 'success');
-                renderizarUsuarios(usuarioLogeado); // Re-renderizar para limpiar y mostrar
-            });
-        }
-
-        // Lógica para botones en filas de usuarios existentes
-        const row = target.closest('tr[data-user-id]');
-        if (!row) return; // Si el clic no fue en una fila de usuario, no hacer nada más
-        
-        const userId = Number(row.dataset.userId);
-
-        if (target.classList.contains('remove-user-btn')) {
-            showConfirmationModal('¿Estás seguro de eliminar este usuario?', () => {
-                let usuarios = safeJSONParse('usuarios', []);
-                usuarios = usuarios.filter(u => u.id !== userId);
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                showToast('Usuario eliminado.', 'success');
+                addUserForm.reset();
                 renderizarUsuarios(usuarioLogeado);
             });
-        }
-        
-        if (target.classList.contains('change-password-btn')) {
-            const newPassword = prompt("Introduce la nueva contraseña para este usuario:");
-            if (newPassword && newPassword.trim() !== '') {
-                let usuarios = safeJSONParse('usuarios', []);
-                const user = usuarios.find(u => u.id === userId);
-                if (user) {
-                    user.password = newPassword;
-                    localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                    showToast('Contraseña actualizada.', 'success');
-                }
-            }
-        }
-
-        if (target.classList.contains('save-user-btn')) {
-            const updatedRole = row.querySelector('.user-role-select').value;
-            let usuarios = safeJSONParse('usuarios', []);
-            const user = usuarios.find(u => u.id === userId);
-
-            if (user) {
-                user.rol = updatedRole;
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                showToast(`Rol de "${user.username}" actualizado.`, 'success');
-                renderizarUsuarios(usuarioLogeado);
-            }
-        }
-    });
+        });
+    }
 }
