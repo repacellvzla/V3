@@ -433,50 +433,48 @@ input:checked + .slider:before { transform: translateX(22px); }
     width: 100%;
 }
 
+/* Sombreado al pasar el mouse por cualquier fila */
+#tabla-usuarios tbody tr:hover {
+    background-color: var(--color-fondo);
+}
+
 #tabla-usuarios thead th {
     text-align: center;
+    padding: 15px 8px;
 }
 
 #tabla-usuarios td {
     vertical-align: middle;
     text-align: center;
+    padding: 8px;
 }
 
 /* Anchos de columna para alineación perfecta */
-#tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 25%; text-align: left; padding-left: 15px;} /* Usuario */
+#tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 25%; text-align: left; padding-left: 15px; } /* Usuario */
 #tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 20%; } /* Contraseña */
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 25%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
 /* Estilo para la fila del formulario de añadir */
-.add-user-form-row {
-    background-color: var(--color-fondo);
-}
-
 .add-user-form-row td {
-    border-bottom: 2px solid var(--color-borde);
     padding-top: 20px;
     padding-bottom: 20px;
-}
-.add-user-form-row td:first-child {
-    padding-left: 15px;
+    border-bottom: 2px solid var(--color-borde);
 }
 
-
-/* Estilo para las celdas con botones */
+/* Contenedor para los botones de acción */
 .actions-cell {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end; /* ALINEA LOS BOTONES A LA DERECHA */
     align-items: center;
     gap: 8px;
 }
 
-/* Asegura que todos los botones dentro de la tabla tengan el mismo tamaño */
+/* Asegura que todos los botones dentro de la tabla tengan un tamaño adecuado */
 #tabla-usuarios .button {
-    padding: 8px 10px;
+    padding: 8px 12px;
     font-size: 0.85em;
-    flex-grow: 1; /* Hace que los botones en una celda compartan el espacio */
-    max-width: 120px;
+    white-space: nowrap; /* Evita que el texto del botón se parta */
 }
 
 /* Asegura que los <select> ocupen todo el espacio de su celda */
