@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const settingsBtn = document.getElementById('settings-btn');
         const configModal = document.getElementById('modal-configuracion');
         const closeConfigBtn = document.getElementById('close-config-modal');
-        const formCostoFijo = document.getElementById('form-costo-fijo');
         const tablaCostosFijosBody = document.getElementById('tabla-costos-fijos')?.querySelector('tbody');
         const formMetas = document.getElementById('form-metas');
         const formGasto = document.getElementById('form-gasto');
@@ -153,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function verificarEstadoJornada() {
             const controlActual = safeJSONParse('control_diario', null);
-            const hoy = getHoyYMD();
+            const hoy = getHoyYMD(); // Usa la fecha local
             return controlActual && controlActual.fecha === hoy && controlActual.estado === 'abierto';
         }
 
@@ -274,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#form-gasto button[type="submit"]').disabled = !jornadaAbierta;
         }
 
-        // --- BLOQUE DE MANEJADORES DE EVENTOS (EVENT LISTENERS) ---
+        // --- BLOQUE COMPLETO DE MANEJADORES DE EVENTOS ---
         
         // Control Diario
         if (controlDiarioBtn) { controlDiarioBtn.addEventListener('click', abrirModalControlDiario); }
@@ -405,16 +404,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Formularios
         document.getElementById('form-add-cuenta').addEventListener('submit', (e) => {
             e.preventDefault();
-            let config = safeJSONParse('configuracion', { bancos: [], costos_fijos: [], fees: {} });
             const idCuenta = document.getElementById('nombre-cuenta-select').value;
-            const nombreCuenta = document.getElementById('nombre-cuenta-select').options[document.getElementById('nombre-cuenta-select').selectedIndex].text;
             const saldoAingresar = parseFormattedNumber(document.getElementById('saldo-cuenta').value);
             const concepto = document.getElementById('saldo-concepto').value;
             if (!idCuenta || (isNaN(saldoAingresar) || saldoAingresar === 0)) { showToast('Seleccione cuenta e ingrese un saldo válido.','error'); return; }
-            if (!config.bancos.find(b => b.id === idCuenta)) { config.bancos.push({ id: idCuenta, nombre: nombreCuenta }); }
             let transacciones = safeJSONParse('transacciones', []);
             transacciones.push({ id: Date.now(), tipo: 'Ingreso Saldo', cuenta_propia_id: idCuenta, monto_ingreso: saldoAingresar, fechaHora: new Date().toISOString(), estatus: 'Completado', concepto: concepto });
-            localStorage.setItem('configuracion', JSON.stringify(config));
             localStorage.setItem('transacciones', JSON.stringify(transacciones));
             showToast('Saldo ingresado correctamente.', 'success');
             e.target.reset();
@@ -430,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!origenId || !destinoId || !monto || monto <= 0) { showToast('Los campos Desde, Hacia y Monto son obligatorios.', 'error'); return; }
             if (origenId === destinoId) { showToast('Las cuentas no pueden ser la misma.', 'error'); return; }
             let transacciones = safeJSONParse('transacciones', []);
-            const config = safeJSONParse('configuracion', {});
+            let config = safeJSONParse('configuracion', {});
             const saldosActuales = calcularSaldos(config.bancos, transacciones);
             const cuentaOrigen = saldosActuales.find(b => b.id === origenId);
             if (!cuentaOrigen || cuentaOrigen.saldo < monto) { showToast('Saldo insuficiente en la cuenta de origen.', 'error'); return; }
@@ -460,7 +455,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 recalcularYRenderizarTodo();
             });
         }
-
+        
+        if (formMetas) {
+            formMetas.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nuevasMetas = {
+                    ventas: parseFormattedNumber(document.getElementById('meta-ventas').value),
+                    compras: parseFormattedNumber(document.getElementById('meta-compras').value),
+                    gastos: parseFormattedNumber(document.getElementById('meta-gastos').value),
+                    utilidad: parseFormattedNumber(document.getElementById('meta-utilidad').value),
+                    deliveries: parseInt(document.getElementById('meta-deliveries').value, 10) || 0,
+                };
+                let config = safeJSONParse('configuracion', {});
+                config.metas = nuevasMetas;
+                localStorage.setItem('configuracion', JSON.stringify(config));
+                showToast('Metas guardadas exitosamente.', 'success');
+                configModal.classList.remove('active');
+                recalcularYRenderizarTodo();
+            });
+        }
+        
         // Filtros
         document.querySelectorAll('.button-filtro').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -475,10 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const inicio = fechaInicioInput.value;
             const fin = fechaFinInput.value;
             if (!inicio || !fin) { showToast('Debe seleccionar ambas fechas.', 'error'); return; }
-            const fechaInicio = new Date(inicio); const fechaFin = new Date(fin);
-            if (fechaFin < fechaInicio) { showToast('La fecha de fin no puede ser anterior a la de inicio.', 'error'); return; }
-            const diffDias = Math.ceil(Math.abs(fechaFin - fechaInicio) / (1000 * 60 * 60 * 24)) + 1;
-            if (diffDias > 90) { showToast('El rango no puede exceder los 90 días.', 'error'); return; }
             filtroActual = { tipo: 'rango', inicio: inicio, fin: fin };
             recalcularYRenderizarTodo();
         });
@@ -511,6 +521,50 @@ document.addEventListener('DOMContentLoaded', () => {
             closeConfigBtn.addEventListener('click', () => configModal.classList.remove('active'));
         }
 
+        if (utilidadesCard) {
+            utilidadesCard.addEventListener('click', (e) => {
+                if (e.target.classList.contains('ver-detalles-cierre-btn')) {
+                    const header = e.target.closest('.cierre-header');
+                    const details = header.nextElementSibling;
+                    const timestamp = header.dataset.timestamp;
+                    const historial = safeJSONParse('historial_cierres', []);
+                    const cierre = historial.find(c => c.inicioTimestamp === timestamp);
+
+                    if (details.style.display === 'block') {
+                        details.style.display = 'none';
+                        e.target.textContent = 'Ver Detalles';
+                    } else if (cierre) {
+                        let saldosInicialesHTML = '';
+                        cierre.saldosIniciales.forEach(c => saldosInicialesHTML += `<li>${c.nombre}: ${c.id === 'Custodia $' ? '$' : 'Bs.'} ${formatNumber(c.saldo)}</li>`);
+                        let saldosFinalesHTML = '';
+                        cierre.saldosFinales.forEach(c => saldosFinalesHTML += `<li>${c.nombre}: ${c.id === 'Custodia $' ? '$' : 'Bs.'} ${formatNumber(c.saldo)}</li>`);
+
+                        details.innerHTML = `
+                            <h5>Saldos Iniciales</h5><ul>${saldosInicialesHTML}</ul>
+                            <h5>Resumen de Operaciones</h5>
+                            <ul>
+                                <li>Ventas Totales: $${formatNumber(cierre.resumen.ventas)}</li>
+                                <li>Compras Totales: $${formatNumber(cierre.resumen.compras)}</li>
+                                <li>Gastos Totales: Bs. ${formatNumber(cierre.resumen.gastos)}</li>
+                                <li>Utilidad Neta: Bs. ${formatNumber(cierre.resumen.utilidad)}</li>
+                                <li>Nº de Deliveries: ${cierre.resumen.deliveries}</li>
+                            </ul>
+                            <h5>Saldos Finales</h5><ul>${saldosFinalesHTML}</ul>`;
+                        details.style.display = 'block';
+                        e.target.textContent = 'Ocultar Detalles';
+                    }
+                }
+
+                if (e.target.classList.contains('descargar-cierre-btn')) {
+                    const header = e.target.closest('.cierre-header');
+                    const timestamp = header.dataset.timestamp;
+                    const historial = safeJSONParse('historial_cierres', []);
+                    const cierre = historial.find(c => c.inicioTimestamp === timestamp);
+                    if(cierre) generarPdfCierre(cierre);
+                }
+            });
+        }
+        
         // --- INICIALIZACIÓN ---
         autoFormatNumberInput('saldo-cuenta');
         autoFormatNumberInput('monto-transferencia');
