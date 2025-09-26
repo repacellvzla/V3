@@ -431,21 +431,14 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios {
     table-layout: fixed;
     width: 100%;
+    border-collapse: collapse; /* Aseguramos el colapso de bordes */
 }
 
 #tabla-usuarios thead th {
     text-align: center;
     padding: 15px 8px;
+    border-bottom: 2px solid var(--color-principal); /* Línea más gruesa para la cabecera */
 }
-
-#tabla-usuarios tbody tr {
-    border-bottom: 1px solid var(--color-borde); /* Línea divisoria para cada fila */
-}
-
-#tabla-usuarios tbody tr:last-child {
-    border-bottom: none; /* Elimina la última línea */
-}
-
 
 #tabla-usuarios tbody tr:hover {
     background-color: var(--color-fondo);
@@ -455,7 +448,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios td {
     vertical-align: middle;
     text-align: center;
-    padding: 8px;
+    padding: 12px 8px; /* Aumentamos un poco el padding vertical */
+    /* SOLUCIÓN 1: Borde en las celdas para que ocupe todo el ancho */
+    border-bottom: 1px solid var(--color-borde); 
 }
 
 /* Anchos de columna para alineación perfecta */
@@ -477,7 +472,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 /* Contenedor para los botones de acción */
 .actions-cell {
     display: flex;
-    justify-content: flex-end; /* ALINEA LOS BOTONES A LA DERECHA */
+    /* SOLUCIÓN 2: Alinea los botones a la derecha */
+    justify-content: flex-end; 
     align-items: center;
     gap: 8px;
     padding-right: 15px;
