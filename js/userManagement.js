@@ -10,8 +10,8 @@ export function renderizarUsuarios(usuarioLogeado) {
     // --- Fila 1: Formulario para Añadir Usuario ---
     finalHTML += `
         <tr class="add-user-form-row">
-            <td><input type="text" id="new-username-input" placeholder="Nombre de usuario" required></td>
-            <td><input type="password" id="new-password-input" placeholder="Nueva contraseña" required></td>
+            <td><input type="text" id="new-username-input" placeholder="Nuevo usuario" required></td>
+            <td><input type="password" id="new-password-input" placeholder="Contraseña" required></td>
             <td>
                 <select id="new-user-role-select">
                     <option value="ventas">Ventas</option>
@@ -20,7 +20,7 @@ export function renderizarUsuarios(usuarioLogeado) {
                 </select>
             </td>
             <td class="actions-cell">
-                <button id="add-user-btn" class="button button-primary">Añadir</button>
+                <button id="add-user-btn" class="button button-primary">Añadir Usuario</button>
             </td>
         </tr>
     `;
@@ -33,19 +33,16 @@ export function renderizarUsuarios(usuarioLogeado) {
 
         finalHTML += `<tr data-user-id="${user.id}">`;
         
-        // Celda de Usuario
         finalHTML += `<td>${user.username}</td>`;
         
-        // Celda de Contraseña
         finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
              finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
         } else {
-             finalHTML += '********';
+             finalHTML += '••••••••';
         }
         finalHTML += `</td>`;
 
-        // Celda de Rol
         finalHTML += '<td>';
         if(disableActions) {
             finalHTML += user.rol;
@@ -56,7 +53,6 @@ export function renderizarUsuarios(usuarioLogeado) {
         }
         finalHTML += '</td>';
 
-        // Celda de Acciones
         finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
              finalHTML += `<button class="button button-primary save-user-btn">Guardar</button>`;
@@ -103,7 +99,7 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
                 localStorage.setItem('usuarios', JSON.stringify(usuarios));
                 
                 showToast('Usuario añadido exitosamente.', 'success');
-                renderizarUsuarios(usuarioLogeado); // Re-renderizar para limpiar campos y mostrar nuevo usuario
+                renderizarUsuarios(usuarioLogeado);
             });
         }
 
