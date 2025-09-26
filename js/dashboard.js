@@ -7,7 +7,8 @@ import {
     formatFechaCorta,
     parseFormattedNumber,
     formatNumber,
-    showConfirmationModal
+    showConfirmationModal,
+    generarPdfCierre
 } from './utils.js';
 
 import {
@@ -425,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!origenId || !destinoId || !monto || monto <= 0) { showToast('Los campos Desde, Hacia y Monto son obligatorios.', 'error'); return; }
             if (origenId === destinoId) { showToast('Las cuentas no pueden ser la misma.', 'error'); return; }
             let transacciones = safeJSONParse('transacciones', []);
-            let config = safeJSONParse('configuracion', {});
+            const config = safeJSONParse('configuracion', {});
             const saldosActuales = calcularSaldos(config.bancos, transacciones);
             const cuentaOrigen = saldosActuales.find(b => b.id === origenId);
             if (!cuentaOrigen || cuentaOrigen.saldo < monto) { showToast('Saldo insuficiente en la cuenta de origen.', 'error'); return; }

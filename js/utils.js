@@ -60,6 +60,53 @@ export function autoFormatNumberInput(inputId) {
     }
 }
 
+export function generarPdfCierre(cierre) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text(`Reporte de Cierre de Jornada`, 14, 22);
+    doc.setFontSize(11);
+    doc.text(`Fecha: ${formatFechaCorta(cierre.fecha)}`, 14, 32);
+
+    doc.autoTable({
+        startY: 40,
+        head: [['Detalle', 'Valor']],
+        body: [
+            ['Hora de Inicio', formatHora(cierre.inicioTimestamp)],
+            ['Hora de Cierre', formatHora(cierre.cierreTimestamp)],
+            ['---', '---'],
+            ['Ventas Totales', `$ ${formatNumber(cierre.resumen.ventas)}`],
+            ['Compras Totales', `$ ${formatNumber(cierre.resumen.compras)}`],
+            ['Gastos Totales', `Bs. ${formatNumber(cierre.resumen.gastos)}`],
+            ['Utilidad Neta', `Bs. ${formatNumber(cierre.resumen.utilidad)}`],
+            ['Nº de Deliveries', `${cierre.resumen.deliveries}`],
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: [0, 128, 128] }
+    });
+
+    const lastY = doc.autoTable.previous.finalY;
+
+    doc.autoTable({
+        startY: lastY + 10,
+        head: [['Saldos Iniciales', '']],
+        body: cierre.saldosIniciales.map(c => [c.nombre, `${c.id === 'Custodia $' ? '$' : 'Bs.'} ${formatNumber(c.saldo)}`]),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 128, 128] }
+    });
+    
+     doc.autoTable({
+        startY: doc.autoTable.previous.finalY + 10,
+        head: [['Saldos Finales', '']],
+        body: cierre.saldosFinales.map(c => [c.nombre, `${c.id === 'Custodia $' ? '$' : 'Bs.'} ${formatNumber(c.saldo)}`]),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 128, 128] }
+    });
+
+    doc.save(`Cierre_de_Jornada_${cierre.fecha}.pdf`);
+}
+
 // --- LÓGICA DE CONFIRMACIÓN ---
 const modalConfirmacion = document.getElementById('modal-confirmacion');
 const confirmMessage = document.getElementById('confirm-message');

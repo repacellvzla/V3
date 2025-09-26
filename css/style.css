@@ -430,11 +430,27 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 /* --- NUEVOS ESTILOS PARA TABLA DE USUARIOS --- */
+#tabla-usuarios {
+    display: table; /* Revierte a layout de tabla normal */
+    width: 100%;
+    table-layout: fixed; /* Ayuda a forzar anchos de columna */
+}
+
 #tabla-usuarios thead th {
     text-align: center;
 }
+
+/* Anchos de columna para alineación */
+#tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 30%; } /* Usuario */
+#tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 25%; } /* Contraseña */
+#tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
+#tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 25%; } /* Acción */
+
+
 #tabla-usuarios tfoot td {
     padding-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: none;
 }
 .actions-cell {
     display: flex;
@@ -442,10 +458,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     align-items: center;
     gap: 10px;
 }
-#tabla-usuarios .actions-cell {
-    min-width: 210px;
-}
-#tabla-usuarios td.actions-cell {
+#tabla-usuarios tbody .actions-cell {
     justify-content: center;
 }
 #tabla-usuarios tfoot .actions-cell {
