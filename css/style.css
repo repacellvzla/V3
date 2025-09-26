@@ -370,8 +370,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 /* ... (todo el CSS anterior va aquí, sin cambios) ... */
 
-/* ... (todo el CSS anterior va aquí, sin cambios) ... */
-
 /* --- ESTILOS PARA EL HISTORIAL DE CIERRES --- */
 #historial-cierres-container {
     max-height: 400px;
@@ -429,27 +427,17 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 4px 0;
 }
 
-/* --- ESTILOS FINALES Y CORREGIDOS PARA PESTAÑA DE USUARIOS --- */
-#form-add-user .form-row {
-    display: grid;
-    grid-template-columns: 25% 25% 20% 30%; /* Mismas columnas que la tabla */
-    gap: 20px;
-    align-items: center;
-}
-
-#form-add-user .form-group {
-    margin-bottom: 0;
-}
-
+/* --- ESTILOS FINALES Y CORREGIDOS PARA TABLA DE USUARIOS --- */
 #tabla-usuarios {
-    table-layout: fixed;
+    table-layout: fixed; /* Fuerza a la tabla a respetar los anchos definidos */
     width: 100%;
-    margin-top: 20px; /* Espacio entre el formulario y la tabla */
 }
 
+/* Sombreado al pasar el mouse por cualquier fila */
 #tabla-usuarios thead tr:hover,
 #tabla-usuarios tbody tr:hover {
     background-color: var(--color-fondo);
+    transition: background-color 0.2s ease-in-out;
 }
 
 #tabla-usuarios thead th {
@@ -469,6 +457,16 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
+/* Estilo para la fila del formulario de añadir */
+.add-user-form-row {
+    background-color: #242526; /* Un color ligeramente diferente para distinguirla */
+}
+
+.add-user-form-row td {
+    border-bottom: 2px solid var(--color-borde);
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
 
 /* Contenedor para los botones de acción */
 .actions-cell {
@@ -476,14 +474,17 @@ input:checked + .slider:before { transform: translateX(22px); }
     justify-content: flex-end; /* ALINEA LOS BOTONES A LA DERECHA */
     align-items: center;
     gap: 8px;
+    padding-right: 15px;
 }
 
+/* Asegura que todos los botones dentro de la tabla tengan un tamaño adecuado */
 #tabla-usuarios .button {
     padding: 8px 12px;
     font-size: 0.85em;
-    white-space: nowrap;
+    white-space: nowrap; /* Evita que el texto del botón se parta */
 }
 
+/* Asegura que los <select> ocupen todo el espacio de su celda */
 #tabla-usuarios select {
     width: 100%;
 }
