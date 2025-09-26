@@ -5,48 +5,71 @@ export function renderizarUsuarios(usuarioLogeado) {
     if (!tablaUsuariosBody) return;
     
     let usuarios = safeJSONParse('usuarios', []);
-    tablaUsuariosBody.innerHTML = '';
+    let finalHTML = '';
 
+    // --- Fila 1: Formulario para Añadir Usuario ---
+    finalHTML += `
+        <tr class="add-user-form-row">
+            <td><input type="text" id="new-username-input" placeholder="Nombre de usuario" required></td>
+            <td><input type="password" id="new-password-input" placeholder="Nueva contraseña" required></td>
+            <td>
+                <select id="new-user-role-select">
+                    <option value="ventas">Ventas</option>
+                    <option value="supervisor">Supervisor</option>
+                    <option value="administrador">Administrador</option>
+                </select>
+            </td>
+            <td class="actions-cell">
+                <button id="add-user-btn" class="button button-primary">Añadir</button>
+            </td>
+        </tr>
+    `;
+
+    // --- Filas Siguientes: Usuarios Existentes ---
     usuarios.forEach(user => {
         const esAdmin = user.username === 'admin';
         const esUsuarioActual = user.id === usuarioLogeado.id;
         const disableActions = esAdmin || usuarioLogeado.rol !== 'administrador';
 
-        const row = document.createElement('tr');
-        row.dataset.userId = user.id;
-
-        let userCell = `<td>${user.username}</td>`;
+        finalHTML += `<tr data-user-id="${user.id}">`;
         
-        let passwordCell = `<td class="actions-cell">`;
+        // Celda de Usuario
+        finalHTML += `<td>${user.username}</td>`;
+        
+        // Celda de Contraseña
+        finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
-             passwordCell += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
+             finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
         } else {
-             passwordCell += '********';
+             finalHTML += '********';
         }
-        passwordCell += '</td>';
+        finalHTML += `</td>`;
 
-        let roleCell = '<td>';
+        // Celda de Rol
+        finalHTML += '<td>';
         if(disableActions) {
-            roleCell += user.rol;
+            finalHTML += user.rol;
         } else {
             const rolesDisponibles = ['administrador', 'supervisor', 'ventas'];
             let options = rolesDisponibles.map(rol => `<option value="${rol}" ${user.rol === rol ? 'selected' : ''}>${rol}</option>`).join('');
-            roleCell += `<select class="user-role-select">${options}</select>`;
+            finalHTML += `<select class="user-role-select">${options}</select>`;
         }
-        roleCell += '</td>';
+        finalHTML += '</td>';
 
-        let actionsCell = `<td class="actions-cell">`;
+        // Celda de Acciones
+        finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
-             actionsCell += `<button class="button button-primary save-user-btn">Guardar</button>`;
+             finalHTML += `<button class="button button-primary save-user-btn">Guardar</button>`;
         }
         if (!esUsuarioActual && !disableActions) { 
-            actionsCell += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
+            finalHTML += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
         }
-        actionsCell += '</td>';
+        finalHTML += '</td>';
 
-        row.innerHTML = userCell + passwordCell + roleCell + actionsCell;
-        tablaUsuariosBody.appendChild(row);
+        finalHTML += '</tr>';
     });
+
+    tablaUsuariosBody.innerHTML = finalHTML;
 }
 
 export function gestionarEventosUsuarios(usuarioLogeado) {
@@ -80,9 +103,7 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
                 localStorage.setItem('usuarios', JSON.stringify(usuarios));
                 
                 showToast('Usuario añadido exitosamente.', 'success');
-                newUsernameInput.value = '';
-                newPasswordInput.value = '';
-                renderizarUsuarios(usuarioLogeado);
+                renderizarUsuarios(usuarioLogeado); // Re-renderizar para limpiar campos y mostrar nuevo usuario
             });
         }
 

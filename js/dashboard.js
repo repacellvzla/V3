@@ -8,7 +8,7 @@ import {
     parseFormattedNumber,
     formatNumber,
     showConfirmationModal,
-    generarPdfCierre
+    generarPdfCierre // <--- IMPORTACIÓN AÑADIDA
 } from './utils.js';
 
 import {

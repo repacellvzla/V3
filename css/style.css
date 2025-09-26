@@ -368,6 +368,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     margin-top: 25px;
 }
 
+/* ... (todo el CSS anterior va aquí) ... */
+
 /* --- ESTILOS PARA EL HISTORIAL DE CIERRES --- */
 #historial-cierres-container {
     max-height: 400px;
@@ -431,9 +433,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 /* --- NUEVOS ESTILOS PARA TABLA DE USUARIOS --- */
 #tabla-usuarios {
-    display: table; /* Revierte a layout de tabla normal */
-    width: 100%;
     table-layout: fixed; /* Ayuda a forzar anchos de columna */
+    width: 100%;
 }
 
 #tabla-usuarios thead th {
@@ -441,26 +442,21 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 /* Anchos de columna para alineación */
-#tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 30%; } /* Usuario */
-#tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 25%; } /* Contraseña */
+#tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 25%; text-align: left; } /* Usuario */
+#tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 20%; } /* Contraseña */
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
-#tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 25%; } /* Acción */
+#tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 35%; } /* Acción */
 
-
-#tabla-usuarios tfoot td {
+.add-user-form-row td {
     padding-top: 20px;
-    padding-bottom: 10px;
-    border-bottom: none;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--color-borde);
 }
+
 .actions-cell {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     gap: 10px;
-}
-#tabla-usuarios tbody .actions-cell {
-    justify-content: center;
-}
-#tabla-usuarios tfoot .actions-cell {
-    justify-content: flex-start;
+    padding: 8px 15px; /* Reduce el padding para que quepan los botones */
 }
