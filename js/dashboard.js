@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formGasto = document.getElementById('form-gasto');
         const utilidadesCard = document.getElementById('utilidades-card');
         const controlDiarioBtn = document.getElementById('control-diario-btn');
+        const controlDiarioStatusDot = document.getElementById('control-diario-status-dot'); // <-- ESTA LÍNEA FALTABA
         const modalControlDiario = document.getElementById('modal-control-diario');
         const closeControlDiarioModalBtn = document.getElementById('close-control-diario-modal');
         const controlDiarioModalTitle = document.getElementById('control-diario-modal-title');
@@ -241,33 +242,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cerrarJornada = () => {
-             if (!confirm('¿Estás seguro de que deseas cerrar la jornada? Esta acción es definitiva.')) { return; }
-            const controlActual = safeJSONParse('control_diario', null);
-            if (!controlActual || controlActual.estado !== 'abierto') {
-                showToast('No hay una jornada activa para cerrar.', 'error');
-                return;
-            }
-            const transacciones = safeJSONParse('transacciones', []);
-            const config = safeJSONParse('configuracion', { bancos: [] });
-            const saldosFinales = calcularSaldos(config.bancos, transacciones);
-            const transaccionesDelDia = transacciones.filter(t => new Date(t.fechaHora) >= new Date(controlActual.inicioTimestamp));
-            const resumen = {
-                ventas: transaccionesDelDia.filter(t => t.tipo === 'Venta').reduce((sum, t) => sum + (parseFloat(t.monto_total_usd) || 0), 0),
-                compras: transaccionesDelDia.filter(t => t.tipo === 'Compra').reduce((sum, t) => sum + (parseFloat(t.monto_total_usd) || 0), 0),
-                gastos: transaccionesDelDia.filter(t => t.tipo === 'Gasto').reduce((sum, t) => sum + (parseFloat(t.monto_gasto) || 0), 0),
-                deliveries: transaccionesDelDia.filter(t => t.delivery === true).length,
-                utilidad: calcularUtilidad(transaccionesDelDia, transacciones.filter(t => t.tipo === 'Compra'), config.costos_fijos)
-            };
-            controlActual.estado = 'cerrado';
-            controlActual.cierreTimestamp = new Date().toISOString();
-            controlActual.saldosFinales = saldosFinales;
-            controlActual.resumen = resumen;
-            let historialCierres = safeJSONParse('historial_cierres', []);
-            historialCierres.push(controlActual);
-            localStorage.setItem('historial_cierres', JSON.stringify(historialCierres));
-            localStorage.setItem('control_diario', JSON.stringify(controlActual));
-            showToast(`Jornada del ${formatFechaCorta(controlActual.fecha)} cerrada exitosamente.`, 'success');
-            recalcularYRenderizarTodo();
+             showConfirmationModal('¿Estás seguro de que deseas cerrar la jornada? Esta acción es definitiva.', () => {
+                const controlActual = safeJSONParse('control_diario', null);
+                if (!controlActual || controlActual.estado !== 'abierto') {
+                    showToast('No hay una jornada activa para cerrar.', 'error');
+                    return;
+                }
+                const transacciones = safeJSONParse('transacciones', []);
+                const config = safeJSONParse('configuracion', { bancos: [] });
+                const saldosFinales = calcularSaldos(config.bancos, transacciones);
+                const transaccionesDelDia = transacciones.filter(t => new Date(t.fechaHora) >= new Date(controlActual.inicioTimestamp));
+                const resumen = {
+                    ventas: transaccionesDelDia.filter(t => t.tipo === 'Venta').reduce((sum, t) => sum + (parseFloat(t.monto_total_usd) || 0), 0),
+                    compras: transaccionesDelDia.filter(t => t.tipo === 'Compra').reduce((sum, t) => sum + (parseFloat(t.monto_total_usd) || 0), 0),
+                    gastos: transaccionesDelDia.filter(t => t.tipo === 'Gasto').reduce((sum, t) => sum + (parseFloat(t.monto_gasto) || 0), 0),
+                    deliveries: transaccionesDelDia.filter(t => t.delivery === true).length,
+                    utilidad: calcularUtilidad(transaccionesDelDia, transacciones.filter(t => t.tipo === 'Compra'), config.costos_fijos)
+                };
+                controlActual.estado = 'cerrado';
+                controlActual.cierreTimestamp = new Date().toISOString();
+                controlActual.saldosFinales = saldosFinales;
+                controlActual.resumen = resumen;
+                let historialCierres = safeJSONParse('historial_cierres', []);
+                historialCierres.push(controlActual);
+                localStorage.setItem('historial_cierres', JSON.stringify(historialCierres));
+                localStorage.setItem('control_diario', JSON.stringify(controlActual));
+                showToast(`Jornada del ${formatFechaCorta(controlActual.fecha)} cerrada exitosamente.`, 'success');
+                recalcularYRenderizarTodo();
+            });
         };
 
         if (controlDiarioBtn) { controlDiarioBtn.addEventListener('click', abrirModalControlDiario); }
@@ -290,8 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
-        // --- (El resto de los event listeners que no fueron movidos, como el de exportar, etc. irían aquí) ---
         
         // --- INICIALIZACIÓN ---
         autoFormatNumberInput('saldo-cuenta');
