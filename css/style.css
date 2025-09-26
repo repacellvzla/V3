@@ -427,34 +427,29 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 4px 0;
 }
 
-/* --- ESTILOS FINALES Y DEFINITIVOS PARA PESTAÑA DE USUARIOS --- */
-#tab-usuarios .form-row {
-    display: grid;
-    grid-template-columns: 25% 25% 20% 1fr; /* Mismas columnas que la tabla */
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#tab-usuarios .form-group {
-    margin-bottom: 0;
-}
-
+/* --- ESTILOS FINALES Y DEFINITIVOS PARA TABLA DE USUARIOS --- */
 #tabla-usuarios {
-    table-layout: fixed; /* Fuerza a la tabla a respetar los anchos definidos */
+    table-layout: fixed;
     width: 100%;
-}
-
-/* Sombreado al pasar el mouse por cualquier fila */
-#tabla-usuarios tbody tr:hover {
-    background-color: var(--color-fondo);
-    transition: background-color 0.2s ease-in-out;
 }
 
 #tabla-usuarios thead th {
     text-align: center;
     padding: 15px 8px;
-    border-bottom: 2px solid var(--color-borde);
+}
+
+#tabla-usuarios tbody tr {
+    border-bottom: 1px solid var(--color-borde); /* Línea divisoria para cada fila */
+}
+
+#tabla-usuarios tbody tr:last-child {
+    border-bottom: none; /* Elimina la última línea */
+}
+
+
+#tabla-usuarios tbody tr:hover {
+    background-color: var(--color-fondo);
+    transition: background-color 0.2s ease-in-out;
 }
 
 #tabla-usuarios td {
@@ -469,6 +464,16 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
+/* Estilo para la fila del formulario de añadir */
+.add-user-form-row {
+    background-color: #242526;
+}
+
+.add-user-form-row td {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
 /* Contenedor para los botones de acción */
 .actions-cell {
     display: flex;
@@ -478,14 +483,19 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding-right: 15px;
 }
 
-/* Asegura que todos los botones dentro de la tabla tengan un tamaño adecuado */
 #tabla-usuarios .button {
     padding: 8px 12px;
     font-size: 0.85em;
     white-space: nowrap;
 }
 
-/* Asegura que los <select> ocupen todo el espacio de su celda */
-#tabla-usuarios select {
+#tabla-usuarios select,
+#tabla-usuarios input {
     width: 100%;
+    font-size: 0.9em;
+}
+
+/* Estilo para la fila en modo edición */
+.editing-row {
+    background-color: rgba(0, 128, 128, 0.1);
 }
