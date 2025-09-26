@@ -35,6 +35,7 @@ export function renderizarUsuarios(usuarioLogeado) {
         
         finalHTML += `<td>${user.username}</td>`;
         
+        // Celda de Contraseña
         finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
              finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
@@ -43,6 +44,7 @@ export function renderizarUsuarios(usuarioLogeado) {
         }
         finalHTML += `</td>`;
 
+        // Celda de Rol
         finalHTML += '<td>';
         if(disableActions) {
             finalHTML += user.rol;
@@ -53,12 +55,17 @@ export function renderizarUsuarios(usuarioLogeado) {
         }
         finalHTML += '</td>';
 
+        // Celda de Acciones
         finalHTML += `<td class="actions-cell">`;
         if (!disableActions) {
              finalHTML += `<button class="button button-primary save-user-btn">Guardar</button>`;
         }
         if (!esUsuarioActual && !disableActions) { 
             finalHTML += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
+        }
+        // -- CAMBIO: Añade un espacio vacío si no hay botones para mantener la alineación --
+        if (esAdmin) {
+            finalHTML += `&nbsp;`;
         }
         finalHTML += '</td>';
 
