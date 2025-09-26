@@ -5,113 +5,100 @@ export function renderizarUsuarios(usuarioLogeado) {
     if (!tablaUsuariosBody) return;
     
     let usuarios = safeJSONParse('usuarios', []);
-    let finalHTML = '';
+    tablaUsuariosBody.innerHTML = ''; // Limpia la tabla antes de dibujar
 
-    // --- Fila 1: Formulario para Añadir Usuario ---
-    finalHTML += `
-        <tr class="add-user-form-row">
-            <td><input type="text" id="new-username-input" placeholder="Nuevo usuario" required></td>
-            <td><input type="password" id="new-password-input" placeholder="Contraseña" required></td>
-            <td>
-                <select id="new-user-role-select">
-                    <option value="ventas">Ventas</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="administrador">Administrador</option>
-                </select>
-            </td>
-            <td class="actions-cell">
-                <button id="add-user-btn" class="button button-primary">Añadir Usuario</button>
-            </td>
-        </tr>
-    `;
-
-    // --- Filas Siguientes: Usuarios Existentes ---
+    // Dibuja solo los usuarios existentes
     usuarios.forEach(user => {
         const esAdmin = user.username === 'admin';
         const esUsuarioActual = user.id === usuarioLogeado.id;
         const disableActions = esAdmin || usuarioLogeado.rol !== 'administrador';
 
-        finalHTML += `<tr data-user-id="${user.id}">`;
-        
-        finalHTML += `<td>${user.username}</td>`;
+        const row = document.createElement('tr');
+        row.dataset.userId = user.id;
+
+        // Celda de Usuario
+        let userCell = `<td>${user.username}</td>`;
         
         // Celda de Contraseña
-        finalHTML += `<td class="actions-cell">`;
+        let passwordCell = `<td class="actions-cell">`;
         if (!disableActions) {
-             finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
+             passwordCell += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
         } else {
-             finalHTML += '••••••••';
+             passwordCell += '••••••••';
         }
-        finalHTML += `</td>`;
+        passwordCell += `</td>`;
 
         // Celda de Rol
-        finalHTML += '<td>';
+        let roleCell = '<td>';
         if(disableActions) {
-            finalHTML += user.rol;
+            roleCell += user.rol;
         } else {
             const rolesDisponibles = ['administrador', 'supervisor', 'ventas'];
             let options = rolesDisponibles.map(rol => `<option value="${rol}" ${user.rol === rol ? 'selected' : ''}>${rol}</option>`).join('');
-            finalHTML += `<select class="user-role-select">${options}</select>`;
+            roleCell += `<select class="user-role-select">${options}</select>`;
         }
-        finalHTML += '</td>';
+        roleCell += '</td>';
 
         // Celda de Acciones
-        finalHTML += `<td class="actions-cell">`;
+        let actionsCell = `<td class="actions-cell">`;
         if (!disableActions) {
-             finalHTML += `<button class="button button-primary save-user-btn">Guardar</button>`;
+             actionsCell += `<button class="button button-primary save-user-btn">Guardar</button>`;
         }
         if (!esUsuarioActual && !disableActions) { 
-            finalHTML += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
+            actionsCell += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
         }
-        // -- CAMBIO: Añade un espacio vacío si no hay botones para mantener la alineación --
-        if (esAdmin) {
-            finalHTML += `&nbsp;`;
-        }
-        finalHTML += '</td>';
+        actionsCell += `</td>`;
 
-        finalHTML += '</tr>';
+        row.innerHTML = userCell + passwordCell + roleCell + actionsCell;
+        tablaUsuariosBody.appendChild(row);
     });
-
-    tablaUsuariosBody.innerHTML = finalHTML;
 }
 
 export function gestionarEventosUsuarios(usuarioLogeado) {
     const configContent = document.getElementById('modal-configuracion');
-    if (!configContent) return;
+    const addUserForm = document.getElementById('form-add-user');
+    const userTable = document.getElementById('tabla-usuarios');
 
-    configContent.addEventListener('click', (e) => {
-        const target = e.target;
+    if (!configContent || !addUserForm || !userTable) return;
+
+    // Manejador para el formulario de añadir usuario
+    addUserForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newUsernameInput = document.getElementById('new-username-input');
+        const newPasswordInput = document.getElementById('new-password-input');
+        const newRoleSelect = document.getElementById('new-user-role-select');
+        const username = newUsernameInput.value.trim();
+        const password = newPasswordInput.value.trim();
+        const rol = newRoleSelect.value;
+
+        if (!username || !password) {
+            showToast('El usuario y la clave son obligatorios.', 'error');
+            return;
+        }
         
-        if (target.id === 'add-user-btn') {
-            const newUsernameInput = document.getElementById('new-username-input');
-            const newPasswordInput = document.getElementById('new-password-input');
-            const newRoleSelect = document.getElementById('new-user-role-select');
-            const username = newUsernameInput.value.trim();
-            const password = newPasswordInput.value.trim();
-            const rol = newRoleSelect.value;
-
-            if (!username || !password) {
-                showToast('El usuario y la clave son obligatorios.', 'error');
+        showConfirmationModal(`¿Estás seguro de agregar a "${username}"?`, () => {
+            let usuarios = safeJSONParse('usuarios', []);
+            if (usuarios.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('Ese nombre de usuario ya existe.', 'error');
                 return;
             }
             
-            showConfirmationModal(`¿Estás seguro de agregar a "${username}"?`, () => {
-                let usuarios = safeJSONParse('usuarios', []);
-                if (usuarios.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-                    showToast('Ese nombre de usuario ya existe.', 'error');
-                    return;
-                }
-                
-                usuarios.push({ id: Date.now(), username, password, rol });
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                
-                showToast('Usuario añadido exitosamente.', 'success');
-                renderizarUsuarios(usuarioLogeado);
-            });
-        }
+            usuarios.push({ id: Date.now(), username, password, rol });
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            
+            showToast('Usuario añadido exitosamente.', 'success');
+            addUserForm.reset(); // Limpia el formulario
+            renderizarUsuarios(usuarioLogeado);
+        });
+    });
 
+    // Manejador para los botones de la tabla (Guardar, Eliminar, Cambiar Clave)
+    userTable.addEventListener('click', (e) => {
+        const target = e.target;
         const row = target.closest('tr');
-        if (!row || !row.dataset.userId) return;
+
+        if (!row || !row.dataset.userId) return; // Ignora clics fuera de las filas de usuario
+        
         const userId = Number(row.dataset.userId);
 
         if (target.classList.contains('remove-user-btn')) {

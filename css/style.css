@@ -370,6 +370,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 /* ... (todo el CSS anterior va aquí, sin cambios) ... */
 
+/* ... (todo el CSS anterior va aquí, sin cambios) ... */
+
 /* --- ESTILOS PARA EL HISTORIAL DE CIERRES --- */
 #historial-cierres-container {
     max-height: 400px;
@@ -427,13 +429,25 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 4px 0;
 }
 
-/* --- ESTILOS FINALES Y CORREGIDOS PARA TABLA DE USUARIOS --- */
-#tabla-usuarios {
-    table-layout: fixed; /* Fuerza a la tabla a respetar los anchos definidos */
-    width: 100%;
+/* --- ESTILOS FINALES Y CORREGIDOS PARA PESTAÑA DE USUARIOS --- */
+#form-add-user .form-row {
+    display: grid;
+    grid-template-columns: 25% 25% 20% 30%; /* Mismas columnas que la tabla */
+    gap: 20px;
+    align-items: center;
 }
 
-/* Sombreado al pasar el mouse por cualquier fila */
+#form-add-user .form-group {
+    margin-bottom: 0;
+}
+
+#tabla-usuarios {
+    table-layout: fixed;
+    width: 100%;
+    margin-top: 20px; /* Espacio entre el formulario y la tabla */
+}
+
+#tabla-usuarios thead tr:hover,
 #tabla-usuarios tbody tr:hover {
     background-color: var(--color-fondo);
 }
@@ -451,16 +465,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 /* Anchos de columna para alineación perfecta */
 #tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 25%; text-align: left; padding-left: 15px; } /* Usuario */
-#tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 20%; } /* Contraseña */
-#tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 25%; } /* Rol */
+#tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 25%; } /* Contraseña */
+#tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
-/* Estilo para la fila del formulario de añadir */
-.add-user-form-row td {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--color-borde);
-}
 
 /* Contenedor para los botones de acción */
 .actions-cell {
@@ -470,14 +478,12 @@ input:checked + .slider:before { transform: translateX(22px); }
     gap: 8px;
 }
 
-/* Asegura que todos los botones dentro de la tabla tengan un tamaño adecuado */
 #tabla-usuarios .button {
     padding: 8px 12px;
     font-size: 0.85em;
-    white-space: nowrap; /* Evita que el texto del botón se parta */
+    white-space: nowrap;
 }
 
-/* Asegura que los <select> ocupen todo el espacio de su celda */
 #tabla-usuarios select {
     width: 100%;
 }
