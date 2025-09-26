@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas App - Iniciar Sesión</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="login-page">
+    <div id="toast-container"></div>
+    <div class="login-page-wrapper">
+        <div class="logo-container">
+            <img src="./img/logo.png" alt="Finanzas App Logo" class="shiny-logo">
+        </div>
+        <div class="login-container">
+            <div class="login-card">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group password-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" required>
+                        <span id="toggle-password" class="toggle-password-icon">👁️</span>
+                    </div>
+                    <button type="submit" class="button button-primary" style="width: 100%;">Acceder</button>
+                </form>
+            </div>
+            <div class="footer-content">
+                <p>Desarrollado por @repacell &copy; Copyright 2025</p>
+            </div>
+        </div>
+    </div>
+    <script src="./js/login.js"></script>
+</body>
+</html>
