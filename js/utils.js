@@ -1,11 +1,11 @@
 // --- FUNCIONES UTILITARIAS REUTILIZABLES ---
 
 export const getHoyYMD = () => {
-    const now = new Date();
+    const now = new Date(); // Crea una fecha basada en la hora local del navegador
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${year}-${month}-${day}`; // Devuelve la fecha local, ej: "2025-09-26"
 };
 
 export const formatNumber = (num) => {
@@ -85,8 +85,16 @@ export function showConfirmationModal(message, onConfirm) {
         modalConfirmacion.classList.remove('active');
         confirmYesBtn.removeEventListener('click', handleConfirm);
         confirmNoBtn.removeEventListener('click', handleCancel);
+        modalConfirmacion.removeEventListener('click', handleOutsideClick);
+    }
+
+    const handleOutsideClick = (e) => {
+        if (e.target === modalConfirmacion) {
+            closeModal();
+        }
     }
 
     confirmYesBtn.addEventListener('click', handleConfirm);
     confirmNoBtn.addEventListener('click', handleCancel);
+    modalConfirmacion.addEventListener('click', handleOutsideClick);
 }

@@ -15,7 +15,6 @@ export function renderizarUsuarios(usuarioLogeado) {
         const row = document.createElement('tr');
         row.dataset.userId = user.id;
 
-        // Celdas: Usuario, Contraseña, Rol, Acción
         let userCell = `<td>${user.username}</td>`;
         
         let passwordCell = `<td class="actions-cell">`;
@@ -41,7 +40,7 @@ export function renderizarUsuarios(usuarioLogeado) {
              actionsCell += `<button class="button button-primary save-user-btn">Guardar</button>`;
         }
         if (!esUsuarioActual && !disableActions) { 
-            actionsCell += `<button class="button button-danger remove-user-btn" style="margin-left:10px;">Eliminar</button>`;
+            actionsCell += `<button class="button button-danger remove-user-btn">Eliminar</button>`;
         }
         actionsCell += '</td>';
 
@@ -103,7 +102,7 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
         
         if (target.classList.contains('change-password-btn')) {
             const newPassword = prompt("Introduce la nueva contraseña para este usuario:");
-            if (newPassword) {
+            if (newPassword && newPassword.trim() !== '') {
                 let usuarios = safeJSONParse('usuarios', []);
                 const user = usuarios.find(u => u.id === userId);
                 if (user) {

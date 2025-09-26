@@ -1,5 +1,35 @@
 import { formatNumber, formatFechaCorta, formatHora, safeJSONParse } from './utils.js';
 
+export function getRowDataForExport(t) {
+    let operacion = t.tipo || 'N/A', cliente = t.cliente || 'N/A', tasa = 'N/A', saldoPendiente = 'N/A', observacion = t.concepto || '';
+    let bancoMostrado = t.cuenta_propia_id || 'N/A';
+    let montoPrincipal = 'N/A';
+    if ((t.tipo === 'Venta' || t.tipo === 'Compra') && t.delivery === true) { operacion += ' (Delivery)'; }
+    if (t.tipo === 'Venta' || t.tipo === 'Compra') {
+        tasa = t.tasa ? formatNumber(t.tasa) : 'N/A';
+        saldoPendiente = (t.saldo_pendiente_usd != null) ? `$${formatNumber(t.saldo_pendiente_usd)}` : 'N/A';
+        bancoMostrado = t.banco_cliente || 'N/A';
+        montoPrincipal = (t.tipo === 'Venta') ? `Bs. ${formatNumber(t.monto_ves)}` : `$${formatNumber(t.monto_total_usd)}`;
+    } else if (t.tipo === 'Transferencia Propia') {
+        cliente = "Admin";
+        bancoMostrado = `${t.cuenta_propia_id} -> ${t.cuenta_destino_id}`;
+        montoPrincipal = `Bs. ${formatNumber(t.monto_transferencia)}`;
+    } else if (t.tipo === 'Ingreso Saldo') {
+        cliente = 'Admin';
+        bancoMostrado = t.cuenta_propia_id;
+        montoPrincipal = (t.cuenta_propia_id === 'Custodia $') ? `$${formatNumber(t.monto_ingreso)}` : `Bs. ${formatNumber(t.monto_ingreso)}`;
+    } else if (t.tipo === 'Pago Cliente') {
+        montoPrincipal = `$${formatNumber(t.monto_pago_usd)}`;
+        bancoMostrado = 'Custodia $'; saldoPendiente = '$0,00';
+    } else if (t.tipo === 'Gasto') {
+        cliente = 'Admin';
+        bancoMostrado = t.cuenta_origen_id;
+        const simbolo = t.cuenta_origen_id === 'Custodia $' ? '$' : 'Bs.';
+        montoPrincipal = `${simbolo} ${formatNumber(t.monto_gasto)}`;
+    }
+    return [formatFechaCorta(t.fechaHora), formatHora(t.fechaHora), operacion, cliente, tasa, montoPrincipal, bancoMostrado, saldoPendiente, t.estatus || 'N/A', observacion];
+}
+
 export function renderizarKPIs(bancos, transacciones, calcularUtilidad) {
     const kpiBancosContainer = document.getElementById('kpi-grid-bancos');
     const kpiTotalesContainer = document.getElementById('kpi-grid-totales');
