@@ -376,12 +376,58 @@ input:checked + .slider:before { transform: translateX(22px); }
     overflow-y: auto;
     padding-right: 10px;
 }
-/* ... (el resto de estilos de historial de cierres va aquí) ... */
+
+.cierre-item {
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.cierre-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cierre-header h6 {
+    margin: 0;
+    font-size: 1.1em;
+    color: var(--color-texto);
+}
+
+.cierre-header-actions .button {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.cierre-details {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-borde);
+}
+
+.cierre-details h5 {
+    font-size: 1em;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: var(--color-principal-hover);
+}
+
+.cierre-details ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
 .cierre-details li {
     padding: 4px 0;
 }
 
-/* --- ESTILOS FINALES Y DEFINITIVOS PARA LA PESTAÑA DE USUARIOS --- */
+/* --- ESTILOS FINALES Y DEFINITIVOS PARA PESTAÑA DE USUARIOS --- */
 #tab-usuarios .form-row {
     display: grid;
     grid-template-columns: 25% 25% 20% 1fr; /* Mismas columnas que la tabla */
@@ -397,10 +443,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios {
     table-layout: fixed; /* Fuerza a la tabla a respetar los anchos definidos */
     width: 100%;
-    margin-top: 20px; /* Espacio entre el formulario y la tabla */
 }
 
-#tabla-usuarios thead tr:hover,
+/* Sombreado al pasar el mouse por cualquier fila */
 #tabla-usuarios tbody tr:hover {
     background-color: var(--color-fondo);
     transition: background-color 0.2s ease-in-out;
@@ -424,6 +469,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
+/* Contenedor para los botones de acción */
 .actions-cell {
     display: flex;
     justify-content: flex-end; /* ALINEA LOS BOTONES A LA DERECHA */
@@ -432,14 +478,14 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding-right: 15px;
 }
 
+/* Asegura que todos los botones dentro de la tabla tengan un tamaño adecuado */
 #tabla-usuarios .button {
     padding: 8px 12px;
     font-size: 0.85em;
     white-space: nowrap;
 }
 
-#tabla-usuarios select,
-#tabla-usuarios input {
+/* Asegura que los <select> ocupen todo el espacio de su celda */
+#tabla-usuarios select {
     width: 100%;
-    font-size: 0.9em;
 }
