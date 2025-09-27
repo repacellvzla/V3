@@ -445,26 +445,29 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 #tabla-usuarios td {
     vertical-align: middle;
-    text-align: center;
     padding: 12px 8px;
-    /* SOLUCIÓN LÍNEAS: Borde en las celdas para que ocupe todo el ancho */
     border-bottom: 1px solid var(--color-borde); 
 }
 
-/* Anchos de columna para alineación perfecta */
+/* Anchos y alineaciones de columna */
 #tabla-usuarios th:nth-child(1), #tabla-usuarios td:nth-child(1) { width: 25%; text-align: left; padding-left: 15px; } /* Usuario */
 #tabla-usuarios th:nth-child(2), #tabla-usuarios td:nth-child(2) { width: 25%; } /* Contraseña */
-#tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
+#tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; text-align: center; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
-/* Contenedor para los botones de acción */
+
+/* Contenedor para los botones de acción (derecha) */
 .actions-cell {
     display: flex;
-    /* SOLUCIÓN ALINEACIÓN: Alinea los botones a la derecha */
     justify-content: flex-end; 
     align-items: center;
     gap: 8px;
     padding-right: 15px;
+}
+
+/* NUEVA CLASE: Contenedor para el botón "Cambiar" (centro) */
+.center-align {
+    text-align: center;
 }
 
 #tabla-usuarios .button {

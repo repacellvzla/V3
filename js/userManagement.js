@@ -1,9 +1,7 @@
 import { safeJSONParse, showToast, showConfirmationModal } from './utils.js';
 
-// Variable para rastrear qué usuario se está editando
 let editingUserId = null; 
 
-// FUNCIÓN 1 (MODIFICADA): Ahora solo renderiza la lista de usuarios, no el formulario.
 export function renderizarUsuarios(usuarioLogeado) {
     const tablaUsuariosBody = document.querySelector('#tabla-usuarios tbody');
     if (!tablaUsuariosBody) return;
@@ -11,9 +9,6 @@ export function renderizarUsuarios(usuarioLogeado) {
     let usuarios = safeJSONParse('usuarios', []);
     let finalHTML = '';
 
-    // El formulario para añadir ya no se crea aquí.
-
-    // Se renderizan solo las filas de los usuarios existentes.
     usuarios.forEach(user => {
         const esAdmin = user.username === 'admin';
         const esUsuarioActual = user.id === usuarioLogeado.id;
@@ -28,8 +23,8 @@ export function renderizarUsuarios(usuarioLogeado) {
             finalHTML += `<td>${user.username}</td>`;
         }
         
-        // Celda de Contraseña
-        finalHTML += `<td class="actions-cell">`;
+        // Celda de Contraseña (CORREGIDA: ahora usa 'center-align')
+        finalHTML += `<td class="center-align">`; 
         if (!esAdmin) {
             finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
         } else {
@@ -46,8 +41,8 @@ export function renderizarUsuarios(usuarioLogeado) {
             finalHTML += `<td>${user.rol}</td>`;
         }
 
-        // Celda de Acciones
-        finalHTML += `<td class="actions-cell">`;
+        // Celda de Acciones (Correcta: usa 'actions-cell' para alinear a la derecha)
+        finalHTML += `<td class="actions-cell">`; 
         if (!esAdmin && usuarioLogeado.rol === 'administrador') {
             if (isEditing) {
                 finalHTML += `<button class="button button-primary save-edit-btn">Guardar</button>`;
@@ -66,12 +61,10 @@ export function renderizarUsuarios(usuarioLogeado) {
     tablaUsuariosBody.innerHTML = finalHTML;
 }
 
-// FUNCIÓN 2 (MODIFICADA): Ahora gestiona el nuevo formulario y los eventos de la tabla por separado.
 export function gestionarEventosUsuarios(usuarioLogeado) {
     const configModal = document.getElementById('modal-configuracion');
     if (!configModal) return;
 
-    // --- GESTIÓN DEL NUEVO FORMULARIO PARA AÑADIR USUARIO ---
     const formAddUser = document.getElementById('form-add-user');
     formAddUser.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -99,12 +92,11 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
             localStorage.setItem('usuarios', JSON.stringify(usuarios));
             
             showToast('Usuario añadido exitosamente.', 'success');
-            formAddUser.reset(); // Limpia el formulario
-            renderizarUsuarios(usuarioLogeado); // Vuelve a renderizar la tabla
+            formAddUser.reset(); 
+            renderizarUsuarios(usuarioLogeado); 
         });
     });
 
-    // --- GESTIÓN DE CLICS EN LA TABLA (EDITAR, ELIMINAR, ETC.) ---
     const tablaUsuarios = document.getElementById('tabla-usuarios');
     tablaUsuarios.addEventListener('click', (e) => {
         const target = e.target;
@@ -112,17 +104,14 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
         if (!row) return;
         const userId = Number(row.dataset.userId);
 
-        // Entrar en modo edición
         if (target.classList.contains('edit-user-btn')) {
             editingUserId = userId;
             renderizarUsuarios(usuarioLogeado);
         }
-        // Cancelar edición
         if (target.classList.contains('cancel-edit-btn')) {
             editingUserId = null;
             renderizarUsuarios(usuarioLogeado);
         }
-        // Guardar cambios
         if (target.classList.contains('save-edit-btn')) {
             const updatedUsername = row.querySelector('.edit-username-input').value.trim();
             const updatedRole = row.querySelector('.edit-role-select').value;
@@ -150,7 +139,6 @@ export function gestionarEventosUsuarios(usuarioLogeado) {
                 renderizarUsuarios(usuarioLogeado);
             }
         }
-        // Eliminar y cambiar clave
         if (target.classList.contains('remove-user-btn')) {
             showConfirmationModal('¿Estás seguro de eliminar este usuario?', () => {
                 let usuarios = safeJSONParse('usuarios', []);
