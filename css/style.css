@@ -368,8 +368,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     margin-top: 25px;
 }
 
-/* ... (todo el CSS anterior va aquí, sin cambios) ... */
-
 /* --- ESTILOS PARA EL HISTORIAL DE CIERRES --- */
 #historial-cierres-container {
     max-height: 400px;
@@ -427,17 +425,17 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 4px 0;
 }
 
-/* --- ESTILOS FINALES Y DEFINITIVOS PARA TABLA DE USUARIOS --- */
+/* --- ESTILOS CORREGIDOS PARA TABLA DE USUARIOS --- */
 #tabla-usuarios {
     table-layout: fixed;
     width: 100%;
-    border-collapse: collapse; /* Aseguramos el colapso de bordes */
+    border-collapse: collapse; 
 }
 
 #tabla-usuarios thead th {
     text-align: center;
     padding: 15px 8px;
-    border-bottom: 2px solid var(--color-principal); /* Línea más gruesa para la cabecera */
+    border-bottom: 2px solid var(--color-principal); 
 }
 
 #tabla-usuarios tbody tr:hover {
@@ -448,8 +446,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios td {
     vertical-align: middle;
     text-align: center;
-    padding: 12px 8px; /* Aumentamos un poco el padding vertical */
-    /* SOLUCIÓN 1: Borde en las celdas para que ocupe todo el ancho */
+    padding: 12px 8px;
+    /* SOLUCIÓN LÍNEAS: Borde en las celdas para que ocupe todo el ancho */
     border-bottom: 1px solid var(--color-borde); 
 }
 
@@ -459,20 +457,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 #tabla-usuarios th:nth-child(3), #tabla-usuarios td:nth-child(3) { width: 20%; } /* Rol */
 #tabla-usuarios th:nth-child(4), #tabla-usuarios td:nth-child(4) { width: 30%; } /* Acción */
 
-/* Estilo para la fila del formulario de añadir */
-.add-user-form-row {
-    background-color: #242526;
-}
-
-.add-user-form-row td {
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
 /* Contenedor para los botones de acción */
 .actions-cell {
     display: flex;
-    /* SOLUCIÓN 2: Alinea los botones a la derecha */
+    /* SOLUCIÓN ALINEACIÓN: Alinea los botones a la derecha */
     justify-content: flex-end; 
     align-items: center;
     gap: 8px;
