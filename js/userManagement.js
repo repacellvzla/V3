@@ -16,14 +16,14 @@ export function renderizarUsuarios(usuarioLogeado) {
 
         finalHTML += `<tr data-user-id="${user.id}" class="${isEditing ? 'editing-row' : ''}">`;
 
-        // Celda de Usuario
+        // Celda 1: Usuario
         if (isEditing && !esAdmin) {
             finalHTML += `<td><input type="text" class="edit-username-input" value="${user.username}"></td>`;
         } else {
             finalHTML += `<td>${user.username}</td>`;
         }
         
-        // Celda de Contraseña (CORREGIDA: ahora usa 'center-align')
+        // Celda 2: Contraseña
         finalHTML += `<td class="center-align">`; 
         if (!esAdmin) {
             finalHTML += `<button class="button button-secondary change-password-btn">Cambiar</button>`;
@@ -32,7 +32,7 @@ export function renderizarUsuarios(usuarioLogeado) {
         }
         finalHTML += `</td>`;
 
-        // Celda de Rol
+        // Celda 3: Rol
         if (isEditing && !esAdmin) {
             const rolesDisponibles = ['administrador', 'supervisor', 'ventas'];
             let options = rolesDisponibles.map(rol => `<option value="${rol}" ${user.rol === rol ? 'selected' : ''}>${rol}</option>`).join('');
@@ -41,7 +41,7 @@ export function renderizarUsuarios(usuarioLogeado) {
             finalHTML += `<td>${user.rol}</td>`;
         }
 
-        // Celda de Acciones (Correcta: usa 'actions-cell' para alinear a la derecha)
+        // Celda 4: Acción (Botones "Editar" y "Eliminar" van aquí)
         finalHTML += `<td class="actions-cell">`; 
         if (!esAdmin && usuarioLogeado.rol === 'administrador') {
             if (isEditing) {

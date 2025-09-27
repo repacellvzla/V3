@@ -425,7 +425,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 4px 0;
 }
 
-/* --- ESTILOS CORREGIDOS PARA TABLA DE USUARIOS --- */
+/* --- ESTILOS FINALES Y CORREGIDOS PARA TABLA DE USUARIOS --- */
 #tabla-usuarios {
     table-layout: fixed;
     width: 100%;
@@ -438,8 +438,13 @@ input:checked + .slider:before { transform: translateX(22px); }
     border-bottom: 2px solid var(--color-principal); 
 }
 
+#tabla-usuarios tbody tr {
+    /* Corrección Fondo Negro: Se hace transparente para heredar el del modal */
+    background-color: transparent;
+}
+
 #tabla-usuarios tbody tr:hover {
-    background-color: var(--color-fondo);
+    background-color: #3a3b3c; /* Se mantiene el efecto hover */
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -465,7 +470,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding-right: 15px;
 }
 
-/* NUEVA CLASE: Contenedor para el botón "Cambiar" (centro) */
+/* Contenedor para el botón "Cambiar" (centro) */
 .center-align {
     text-align: center;
 }
